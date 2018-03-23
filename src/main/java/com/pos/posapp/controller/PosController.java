@@ -2,6 +2,7 @@ package com.pos.posapp.controller;
 
 import com.pos.posapp.object.Sale;
 import com.pos.posapp.repository.SaleRepository;
+import com.pos.posapp.services.PosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,12 +23,11 @@ import java.util.Set;
 @Controller
 public class PosController {
     Sale sale;
-    Set<Sale> list = new HashSet<>();
-    SaleRepository saleRepository;
+    PosService posService;
 
     @Autowired
-    public PosController(SaleRepository saleRepository) {
-        this.saleRepository = saleRepository;
+    public PosController(PosService posService) {
+        this.posService = posService;
     }
 
     /*
@@ -55,19 +55,19 @@ public class PosController {
                 return "addsale";
             }
             sale = new Sale(id, name, amount);
-            saleRepository.save(sale);
+            posService.add(sale);
      //   }
         return "addsale";
 
     }
     @RequestMapping("/show")
     public String showsales(Model model){
-        model.addAttribute("sales",saleRepository.findAll());
+        model.addAttribute("sales",posService.showSales());
         return "sales_list";
     }
     @RequestMapping(value = "/remove", method = RequestMethod.GET)
     public String deleteSale(Model model){
-        model.addAttribute("sales",saleRepository.findAll());
+        model.addAttribute("sales",posService.showSales());
         return "delete_sale";
     }
     @RequestMapping(value = "/remove_sale",method = RequestMethod.POST)
@@ -75,7 +75,7 @@ public class PosController {
         String sale_id = request.getParameter("sale_id");
         int id = Integer.parseInt(sale_id);
      //   list.removeIf(sale -> sale.getId() == id);
-        saleRepository.deleteById(id);
+        posService.delete(id);
         return "redirect:/remove";
     }
 }
